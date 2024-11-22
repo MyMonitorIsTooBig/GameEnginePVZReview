@@ -14,6 +14,18 @@ public class Zombie : Observer
 
     int health = 3;
 
+
+    bool isShoot = false;
+
+
+    float timeToShoot = 2.0f;
+    float timeSinceShoot = 0.0f;
+
+
+    [SerializeField] GameObject bullet;
+
+    [SerializeField] ZombieSpawner spawner;
+
     public override void Notify(Subject subject)
     {
         stage++;
@@ -26,6 +38,21 @@ public class Zombie : Observer
         time.attachOb(this);
 
         rb = GetComponent<Rigidbody>();
+        spawner = GameObject.Find("ZombieSpawner").GetComponent<ZombieSpawner>();
+    }
+
+    private void OnEnable()
+    {
+        int ranNum = Random.Range(0, 10);
+
+        if(ranNum == 0)
+        {
+            isShoot = true;
+        }
+        else
+        {
+            isShoot = false;
+        }
     }
 
     // Update is called once per frame
@@ -37,13 +64,21 @@ public class Zombie : Observer
         {
             Die();
         }
+
+
+        timeSinceShoot = timeSinceShoot + Time.deltaTime;
+
+        if(isShoot && timeSinceShoot >= timeToShoot)
+        {
+            shoot();
+            timeSinceShoot = 0.0f;
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.tag == "Bullet")
         {
-            Debug.Log("hit");
             health--;
             Destroy(collision.gameObject);
         }
@@ -51,13 +86,26 @@ public class Zombie : Observer
         if(collision.gameObject.tag == "End")
         {
             Time.timeScale = 0;
+            Application.Quit();
         }
     }
 
     public void Die()
     {
+        int ranNum = Random.Range(0, 2);
+        
+        if(ranNum == 0)
+        {
+            spawner.spawnZombie();
+        }
+
         health = zombieStats._maxHealth;
         moneyManager.Instance.changeMoney(zombieStats._maxCoin);
         gameObject.SetActive(false);
+    }
+
+    void shoot()
+    {
+        Instantiate(bullet, transform.position, Quaternion.identity);
     }
 }

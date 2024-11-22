@@ -15,7 +15,7 @@ public class ZombieSpawner : Observer
 
     Timer time;
 
-    int stage = 0;
+    int stage = 1;
 
     float timer = 0.0f;
 
@@ -27,6 +27,8 @@ public class ZombieSpawner : Observer
     void Start()
     {
         time = GameObject.Find("Timer").GetComponent<Timer>();
+
+        time.attachOb(this);
     }
 
     // Update is called once per frame
@@ -55,7 +57,7 @@ public class ZombieSpawner : Observer
     }
 
 
-    void spawnZombie()
+    public void spawnZombie()
     {
         randomNum = Random.Range(0, 5);
         Zombie z = ObjectPool.CreateEnemy("Zombie", spawnLocations[randomNum].position, Quaternion.identity);
@@ -65,9 +67,15 @@ public class ZombieSpawner : Observer
     public override void Notify(Subject subject)
     {
         stage++;
-        if(stage >= 2)
+        if(stage%2 == 0)
         {
-            stageTime = 5;
+            if(stageTime >= 3)
+            {
+                stageTime = stageTime - 2;
+            }
         }
+
+        Debug.Log(stage);
+
     }
 }

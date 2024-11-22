@@ -92,4 +92,15 @@ public class DaveMovement : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.tag == "Enemybullet")
+        {
+            Debug.Log("hit bullet");
+            Time.timeScale = 0;
+            Application.Quit();
+            
+        }
+    }
+
 }
